@@ -2,6 +2,8 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import './App.css';
 import logotdt from './pic/logotdt.webp';
 import logoavta from './Components/picgo.png';
+import Cookies from 'js-cookie';
+import usavtar from './pic/usav.png';
 
 const RegisterPage = lazy(() => import('./Components/RegisterAccount'));
 const Dashboard = lazy(() => import('./Components/Dashboard'));
@@ -11,11 +13,33 @@ const SpeedInputPage = lazy(() => import('./Components/Speed'));
 const SmallFrame = lazy(() => import('./Components/ThreeJSComponent'));
 const ChartMongo = lazy(() => import('./Components/Chart'));
 const ListAccount = lazy(() => import('./Components/ListAccount'));
+const LoginPage = lazy(() => import('./Components/Login'));
+
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('Dashboard');
+  const [currentPage1, setCurrentPage1] = useState('Login');
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm state isLoggedIn
+
+  const handleLogout = () => {
+    document.cookie = 'isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    setIsLoggedIn(false);
+  };
+
+  const session_username = Cookies.get('session_username');
+  const session_firstname = Cookies.get('session_firstname');
+  const session_lastname = Cookies.get('session_lastname');
+  const session_birthdate = Cookies.get('session_birthdate');
+  const session_date = Cookies.get('session_date');
+  const session_phone = Cookies.get('session_phone');
+  const session_email = Cookies.get('session_email');
+  const session_password = Cookies.get('session_password');
 
   useEffect(() => {
+    const isLoggedInCookie = document.cookie.split(';').some((cookie) => cookie.trim().startsWith('isLoggedIn='));
+    if (isLoggedInCookie) {
+      setIsLoggedIn(true);
+    }
     const body = document.querySelector('body');
     const modeToggle = body.querySelector('.mode-toggle');
     const sidebar = body.querySelector('nav');
@@ -58,68 +82,110 @@ const App = () => {
     };
   }, []); // Empty dependency array to run the effect only once
 
+  // Retrieve the SessionUser from cookies
+
   const renderUI = () => {
-    switch (currentPage) {
-      case 'Dashboard':
-        return <Dashboard />;
-      case 'register':
-        return <RegisterPage />;
-      case 'speedtest':
-        return <SpeedInputPage />;
-      case 'ChartMongo':
-        return <ChartMongo />;
-      case 'ListAccount':
-        return <ListAccount />;
-      case 'ThreeJS':
-        return <SmallFrame />;
-      case 'threeScene':
-        return (
-          <div>
-            <div className='title'>
-              <i className='uil uil-tachometer-fast-alt'></i>
-              <span className='text'>Gauge</span>
-            </div>
-            <div className='bg3'>
-              <GaugeExample />
-            </div>
-            <div className='title'>
-              <i className='uil uil-tachometer-fast-alt'></i>
-              <span className='text'>ThreeScene</span>
-            </div>
+
+    if (!isLoggedIn) {
+      switch (currentPage1) {
+        case 'LoginPage':
+          return <LoginPage setIsLoggedIn={setIsLoggedIn} />;
+        case 'register':
+          return <RegisterPage />;
+      }
+    } else {
+      switch (currentPage) {
+        case 'Dashboard':
+          return <Dashboard
+            session_username={session_username}
+            session_firstname={session_firstname}
+            session_lastname={session_lastname}
+            session_birthdate={session_birthdate}
+            session_date={session_date}
+            session_phone={session_phone}
+            session_email={session_email}
+            session_password={session_password} />;
+        case 'speedtest':
+          return <SpeedInputPage />;
+        case 'ChartMongo':
+          return <ChartMongo />;
+        case 'ListAccount':
+          return <ListAccount />;
+        case 'ThreeJS':
+          return <SmallFrame />;
+        case 'threeScene':
+          return (
             <div>
-              <ThreeScene />
+              <div className='title'>
+                <i className='uil uil-tachometer-fast-alt'></i>
+                <span className='text'>Gauge</span>
+              </div>
+              <div className='bg3'>
+                <GaugeExample />
+              </div>
+              <div className='title'>
+                <i className='uil uil-tachometer-fast-alt'></i>
+                <span className='text'>ThreeScene</span>
+              </div>
+              <div>
+                <ThreeScene />
+              </div>
             </div>
-          </div>
-        );
-      default:
-        return null;
+          );
+        default:
+          return null;
+      }
     }
   };
 
   return (
     <div> <link rel='stylesheet' href='https://unicons.iconscout.com/release/v4.0.0/css/line.css' />
       <nav>
-        <div className='logo-name'>
-          <div className='logo-image1'>
-            <img src={logoavta} alt='Logo' />
+        {!isLoggedIn ? (
+          <div>
+            <div className='logo-name'>
+              <div className='logo-image1'>
+                <img src={logoavta} alt='Logo' />
+              </div>
+              <span className='logo_name'>Motion System</span>
+            </div>
           </div>
-          <span className='logo_name'>KSystem</span>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <h2 class="online-text">Online</h2>
-        </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {/* <div className='logo-image22'>
+                <img src={usavtar} alt='Logo' />
+              </div> */}
+            </div>
+            <a>
+              <span className='link-name'>{session_firstname} {session_lastname}</span>
+            </a>
+            <div style={{ textAlign: 'center' }}>
+              <h2 className='online-text'>Online</h2>
+            </div>
+          </div>
+        )}
         <div className='menu-items'>
-          <ul className='nav-links'>
+          {!isLoggedIn ? (
+            <ul className='nav-links'>
+              <li>
+                <a onClick={() => setCurrentPage1('LoginPage')}>
+                  <i class="uil uil-estate"></i>
+                  <span className="link-name">Login</span>
+                </a>
+              </li>
+              <li>
+                <a onClick={() => setCurrentPage1('register')}>
+                  <i class="uil uil-user-plus"></i>
+                  <span className="link-name">Register</span>
+                </a>
+              </li>
+            </ul>
+          ) : (<ul className='nav-links'>
             <li>
               <a onClick={() => setCurrentPage('Dashboard')}>
                 <i class="uil uil-estate"></i>
                 <span className="link-name">Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a onClick={() => setCurrentPage('register')}>
-                <i class="uil uil-user-plus"></i>
-                <span className="link-name">Register</span>
               </a>
             </li>
             <li>
@@ -152,15 +218,18 @@ const App = () => {
                 <span className="link-name">ChartMongo</span>
               </a>
             </li>
-          </ul>
+          </ul>)}
+
 
           <ul className='logout-mode'>
-            <li>
-              <a>
-                <i className='uil uil-signout'></i>
-                <span className='link-name'>Logout</span>
-              </a>
-            </li>
+            {isLoggedIn ? (
+              <li>
+                <a onClick={handleLogout}>
+                  <i className='uil uil-signout'></i>
+                  <span className='link-name'>Logout</span>
+                </a>
+              </li>
+            ) : null}
 
             <li className='mode'>
               <a>
@@ -173,6 +242,8 @@ const App = () => {
               </div>
             </li>
           </ul>
+
+
         </div>
       </nav>
 

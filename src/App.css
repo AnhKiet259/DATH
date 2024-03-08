@@ -97,6 +97,21 @@ nav .logo-image {
   min-width: 45px;
 }
 
+nav .logo-image22 {
+  text-align: center;
+  justify-content: center;
+  min-width: 45px;
+  margin-top: 20px;
+}
+
+nav .logo-image22 img {
+  width: 100px;
+  object-fit: cover;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
 nav .logo-image1 {
   display: flex;
   justify-content: center;
@@ -124,7 +139,7 @@ nav .logo-image img {
 }
 
 nav .logo-name .logo_name {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 600;
   color: var(--text-color);
   margin-left: 14px;
@@ -203,7 +218,7 @@ body.dark .nav-links li a:hover .link-name {
 }
 
 .menu-items .logout-mode {
-  padding-top: 10px;
+  padding-top: 5px;
   border-top: 1px solid var(--border-color);
 }
 
